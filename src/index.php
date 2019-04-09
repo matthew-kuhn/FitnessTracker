@@ -27,6 +27,7 @@
 				<a href="workouts.php">Workout Info</a>
 				<a href="food.php">Food Info</a>
 				<a href="tracking.php">Tracking</a>
+				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
 		<div id="info">
