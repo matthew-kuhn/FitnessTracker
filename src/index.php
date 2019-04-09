@@ -6,9 +6,18 @@
 		<meta name="description" content="The homepage for the fitness tracking website">
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<script type="text/javascript">
-			function checkLoginForm(){
-				return true;
-			}
+			function checkLoginForm()
+		      {
+		        var userName = document.forms["login_form"]["myusername"].value;
+
+		        if (userName == "") 
+		        {
+		          document.getElementById('formFeedback').innerHTML = "ERROR: User Name must be specified.";
+		          return false;
+		        }
+		        else
+		          return true;
+		      }
 		</script>
 	</head>
 	<body>
