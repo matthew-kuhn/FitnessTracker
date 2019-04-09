@@ -1,0 +1,76 @@
+h1 {
+
+}
+
+h2 {
+	text-align: center;
+	padding: 5px;
+	margin-left: 20px;
+	color: #212121;
+	margin-bottom: 0px;
+}
+
+h3 {
+
+}
+
+p {
+	text-align: center;
+	padding:10px;
+	margin-left: 25px;
+	margin-top: 0px;
+	color: #262626;
+}
+
+div {
+	margin: auto;
+	width: 1000px;
+	background-color: #BDBDBD;
+	border-left: 5px solid #999999;
+}
+
+header {
+	background-color: #BBDEFB
+}
+
+header h1 {
+	color: #212121;
+	margin: auto;
+	padding: 5px;
+	text-align: center;
+}
+
+body {
+	background-color: #1566b7;
+}
+
+nav {
+	background-color: #607D8B;
+	height: 40px;
+	padding: 5px;
+}
+
+nav a {
+	text-decoration: none;
+	color: #212121;
+	float:left;
+	padding: 10px;
+}
+
+nav a:hover {
+	background-color: #BBDEFB;
+}
+
+footer {
+
+}
+
+footer a {
+
+}
+
+footer a:hover {
+
+}
+
+/*color palette taken from https://www.materialpalette.com/blue/blue-grey*/
