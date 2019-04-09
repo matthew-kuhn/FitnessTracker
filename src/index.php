@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang = "en-US">
 	<head>
 		<title>Fitness Tracker</title>
@@ -33,12 +32,10 @@
 			  session_start();
 
 			  // if no username set, then redirect to login
-			  if(!isset($_SESSION['myusername'])){
+			  if(isset($_SESSION['myusername'])){
 			?>
 			<p>we are logged in</p>
-			<?php
-			  }else{
-			?>
+			<?php } ?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
 				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px">
@@ -62,13 +59,12 @@
                   <tr >
                   	<td style="text-align: right"><input type="submit" name="submit" value="Login"></td>
             </form>
-                  	<td>
+                  	<td style="text-align: left;">
                   		<form name="newUser" method="get" id="newUser" action="create_user.php" onsubmit=" ? ">
-                  			<input type="submit" name="newUser" value="Create New User">
+                  			<input type="submit" name="newUser" value="Create New User" style="margin-top:15px">
                   		</form>
                   	</td>
                   </tr>					
 				</table>
 		</div>
 	</body>
-</html>
