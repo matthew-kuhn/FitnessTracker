@@ -49,23 +49,14 @@
 			<?php } else {?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
-				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px">
-                  <tr>
-                    <td colspan="2" style="width:100px">
-                      <div id="formFeedback" class="formError">
-                        <?php 
-                          if (isset($_GET['err'])) {echo 'ERROR: Username - password not valid.'; }
-                        ?>
-                      </div>
-                    </td>
-                  </tr>
+				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px; padding-top: 5px">
                   <tr>
                   	<td style="width:80px">Username:</td>
-                  	<td ><input type="text" name="myusername" id="myusername"></td>
+                  	<td ><input type="text" name="myusername" id="myusername" required ></td>
                   </tr>
                   <tr>
                   	<td style="width:80px">Password:</td>
-                  	<td><input type="password" name="mypassword" id="mypassword"></td>
+                  	<td><input type="password" name="mypassword" id="mypassword" required></td>
                   </tr>
                   <tr >
                   	<td style="text-align: right"><input type="submit" name="submit" value="Login"></td>
