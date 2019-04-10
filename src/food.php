@@ -6,18 +6,7 @@
 		<meta name="description" content="The page for viewing and creating foods">
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<script type="text/javascript">
-			function checkLoginForm()
-		      {
-		        var userName = document.forms["login_form"]["myusername"].value;
-
-		        if (userName == "") 
-		        {
-		          document.getElementById('formFeedback').innerHTML = "ERROR: User Name must be specified.";
-		          return false;
-		        }
-		        else
-		          return true;
-		      }
+			
 		</script>
 	</head>
 	<body>
@@ -31,5 +20,6 @@
 				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
+		
 	</body>
 </html>

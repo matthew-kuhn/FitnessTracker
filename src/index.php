@@ -45,7 +45,7 @@
 			  if(isset($_SESSION['myusername'])){
 			?>
 			<p>we are logged in</p>
-			<?php } ?>
+			<?php } else {?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
 				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px">
@@ -76,5 +76,6 @@
                   	</td>
                   </tr>					
 				</table>
+			<?php } ?>
 		</div>
 	</body>
