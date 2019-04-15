@@ -45,7 +45,8 @@
 			  // if no username set, then redirect to login
 			  if(isset($_SESSION['myusername'])){
 			?>
-			<p>we are logged in</p>
+			<h2>Welcome, <?php echo $_SESSION['myusername'] ?></h2>
+				<p>add a summary of current week, from database</p>
 			<?php } else {?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
