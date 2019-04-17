@@ -25,10 +25,10 @@
 		<header>
 			<h1>FitTrak</h1>
 			<nav>
-				<a href="index.php">Home</a>
 				<a href="workouts.php">Workout Info</a>
 				<a href="food.php">Food Info</a>
-				<a href="tracking.php">Tracking</a>
+				<a href="tracking.php">Tracking</a>			
+				<a href="index.php">Home</a>
 				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
