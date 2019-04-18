@@ -1,3 +1,14 @@
+<?php
+
+			  // retrieve session information
+			  session_start();
+
+			  // if no username set, then redirect to login
+			  if(!isset($_SESSION['myusername'])){
+			  	header("location:index.php");
+			  }
+
+?>
 <html lang="en-US">
 	<head>
 		<title>Food Info</title>
@@ -8,7 +19,18 @@
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
-			
+			function planAction(action){
+				if(action == ""){
+					alert(action);
+					//we need to change the php session variables to update the menus and grocery list
+					return true;
+				}
+				else{
+					//delete div, set up the form to set up a new plan, then 
+					alert(action);
+					return false;
+				}
+			}
 		</script>
 	</head>
 	<body>
@@ -45,7 +67,20 @@
 		</div>
 		<div id="meal_plans" style="clear: both; width: 50%;">
 			<h2 style="margin-top: 0px">Meal Plans</h2>
-				<h3>Current Meal Plan</h3>
+				<h3>Current Meal Plan <!-- This is where  we will print the name from the DB--></h3>
+				<form name="mealPlan" method="?" id="mealPlan" action="" onsubmit="return planAction('food.php')" style="margin: auto;">
+					<!-- populate this select with all existing meal plans -->
+					<select style="display: block; margin: 0 auto; margin-top: 5px; margin-bottom: 5px;">
+						<option>Chicken Only</option>
+						<option>Turkey Only</option>
+						<option>Russia (potato only)</option>
+						<option>O A T S</option>
+					</select>
+					<input type="submit" name="submit1" value="Select Plan" style="display: block; margin: 0 auto; margin-bottom: 5px">
+				</form>
+				<form name="newPlan" id ="newPlan" method="post" action="" onsubmit="return planAction('food_plan.php')">
+					<input type="submit" name="submit" value="Create New Plan" style="display: block; margin: 0 auto">
+				</form>
 		</div>
 	</body>
 </html>
