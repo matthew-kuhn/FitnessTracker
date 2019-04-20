@@ -66,8 +66,7 @@
 				</ul>
 		</div>
 		<div id="meal_plans" style="clear: both; width: 50%;">
-			<h2 style="margin-top: 0px">Meal Plans</h2>
-				<h3>Current Meal Plan <!-- This is where  we will print the name from the DB--></h3>
+			<h2>Current Meal Plan <!-- This is where  we will print the name from the DB--></h3>
 				<form name="mealPlan" method="?" id="mealPlan" action="" onsubmit="return planAction('food.php')" style="margin: auto;">
 					<!-- populate this select with all existing meal plans -->
 					<select style="display: block; margin: 0 auto; margin-top: 5px; margin-bottom: 5px;">
