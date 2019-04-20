@@ -90,6 +90,9 @@ footer a:hover {
 
 }
 
+td {
+	word-wrap: break-word;
+}
 
 
 /*color palette taken from https://www.materialpalette.com/blue/blue-grey*/

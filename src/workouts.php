@@ -18,17 +18,15 @@
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
-			function checkLoginForm()
+			function changePlans(action)
 		      {
-		        var userName = document.forms["login_form"]["myusername"].value;
-
-		        if (userName == "") 
-		        {
-		          document.getElementById('formFeedback').innerHTML = "ERROR: User Name must be specified.";
-		          return false;
+		        if(action == "existing"){
+		        	// document.getElementById('planSelect').innerHTML = "hello";
+		        	//change workouts on page
 		        }
-		        else
-		          return true;
+		        else{
+		        	//change bottom div to display form to create new plan
+		        }
 		      }
 		</script>
 	</head>
@@ -44,26 +42,66 @@
 			</nav>
 		</header>
 		<div id="weekly" style="float:left; width: 48%; margin-top: 15px; margin-bottom: 15px">
-			<h2><?php echo("content to display weekly workout schedule") ?></h2>
-				<p>Day 1</p>
-				<p>day 2</p>
-				<p>day 3</p>
-				<p>day 4</p>
-				<p>day 5</p>
-				<p>day 6</p>
-				<p>day 7</p>
+			<h2><?php echo("Week Overview") ?></h2>
+			<!-- this will be connected to the database and use php to display the weekly overview -->
+				<ul style="float:left; left: 50%; position: relative;">
+					<li style="float:left; right: 50%; position: relative; clear: both">Day 1: <?php echo "Chest and shoulders"?></li>
+					<li style="float:left; right: 50%; position: relative; clear: both">Day 2: <?php echo "3 Mile run"?></li>
+					<li style="float:left; right: 50%; position: relative; clear: both">Day 3: <?php echo "Back and legs"?></li>
+					<li style="float:left; right: 50%; position: relative; clear: both">Day 4: <?php echo "10 sprint intervals" ?></li>
+					<li style="float:left; right: 50%; position: relative; clear: both">Day 5: <?php echo "Legs"?></li>
+				</ul>
 		</div>
 		<div id="monthly" style="float:right; width: 48%; margin-top: 15px; margin-bottom: 15px">
-			<h2>Display Monthly stuff maybe</h2>
-				<p>still havent decided if there is anything better to put here</p>
+			<h2>Workout Close View</h2>
+			<!-- this will be changed based on which day from the left panel gets clicked -->
+				<table style="margin: auto; border-spacing: 10px; table-layout: fixed;">
+					<caption>Day 1: Chest and Shoulders</caption>
+					<tr>
+						<th style="text-align: left">Exercise</td>
+						<th style="text-align: left">Description</td>
+						<th style="text-align: left">Reps</td>
+						<th style="text-align: left">Sets</td>
+					</tr>
+					<tr>
+						<td>Bench Press</td>
+						<td>Flat Barbell Bench Press</td>
+						<td>5-8</td>
+						<td>5</td>
+					</tr>
+					<tr>
+						<td>Incline Bench Press</td>
+						<td>On incline bench, with dumbbells</td>
+						<td>8-12</td>
+						<td>4</td>
+					</tr>
+					<tr>
+						<td>Overhead press</td>
+						<td>standing overhead barbell press, hands shoulder width</td>
+						<td>8-10</td>
+						<td>4</td>
+					</tr>
+					<tr>
+						<td>Front raises</td>
+						<td>Dumbbell in each hand, raise arms to shoulder-height, palms down</td>
+						<td>15-20</td>
+						<td>3</td>
+					</tr>
+				</table>
 		</div>
 		<div id="planSelect" style="clear: both; width: 50%;">
 			<h2>Current Workout Plan</h2>
-			<form>
-				
+			<form name="existingPlan" method="?" action="" onsubmit="return changePlans('existing')" style="margin: auto;">
+				<select style="display: block; margin: 0 auto; margin-top: 5px; margin-bottom: 5px;">
+					<option>PowerLifting</option>
+					<option>Bodybuilding</option>
+					<option>Running</option>
+					<option>Calisthenics</option>
+				</select>
+				<input type="submit" name="submit" value="Select Plan" style="display: block; margin: 0 auto; margin-bottom: 5px">
 			</form>
-			<form>
-				
+			<form name="newPlan" method="?" action="" onsubmit="return changePlans('new')">
+				<input type="submit" name="submit" value="New Plan" style="display: block; margin: 0 auto">
 			</form>
 		</div>
 	</body>

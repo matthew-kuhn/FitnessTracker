@@ -20,7 +20,7 @@
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
 			function planAction(action){
-				if(action == ""){
+				if(action == "food.php"){
 					alert(action);
 					//we need to change the php session variables to update the menus and grocery list
 					return true;
@@ -78,7 +78,7 @@
 					</select>
 					<input type="submit" name="submit1" value="Select Plan" style="display: block; margin: 0 auto; margin-bottom: 5px">
 				</form>
-				<form name="newPlan" id ="newPlan" method="post" action="" onsubmit="return planAction('food_plan.php')">
+				<form name="newPlan" id ="newPlan" method="?" action="" onsubmit="return planAction('food_plan.php')">
 					<input type="submit" name="submit" value="Create New Plan" style="display: block; margin: 0 auto">
 				</form>
 		</div>
