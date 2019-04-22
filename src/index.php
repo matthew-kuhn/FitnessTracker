@@ -47,6 +47,14 @@
 			?>
 			<h2>Welcome, <?php echo $_SESSION['myusername'] ?></h2>
 				<p>add a summary of current week, from database</p>
+				<form style="display: block; margin: auto">
+					<select style="display: block; margin: 0 auto; margin-bottom: 5px">
+						<option>Weekly Summary</option>
+						<option>Monthly Summary</option>
+						<option>Yearly Summary</option>
+					</select>
+					<input type="submit" name="submit" style="display: block; margin: 0 auto">
+				</form>
 			<?php } else {?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
