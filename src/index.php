@@ -19,6 +19,49 @@
 		        else
 		          return true;
 		      }
+
+		      function checkNewUser(){
+		      	var username = document.forms["new_user"]["newusername"].value;
+		      	var password = document.forms["new_user"]["newpassword"].value;
+		      	var password_conf = document.forms["new_user"]["newpassword_conf"].value;
+		      	var fname = document.forms["new_user"]["firstname"].value;
+		      	var lname = document.forms["new_user"]["lastname"].value;
+		      	var pass_regex = new RegExp("^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,32}$");
+		      	var name_regex = new RegExp("^[a-zA-Z]{1,20}$");
+		      	var username_regex = new RegExp("^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,50}$");
+
+		      	// alert(username);
+		      	if(!username_regex.test(username)){
+		      		document.getElementById('formFeedback').innerHTML = "Error: Username does not fit requirements";
+		      		document.getElementById('newusername').style.cssText = "border: 3px solid red";
+		      		return false;
+		      	}
+		      	else if(password != password_conf){
+		      		document.getElementById('formFeedback').innerHTML = "Error: Passwords do not match";
+		      		document.getElementById('newpassword').style.cssText = "border: 3px solid red";
+		      		document.getElementById('newpassword_conf').style.cssText = "border: 3px solid red";
+		      		return false;
+		      	}
+		      	else if(!pass_regex.test(password)){
+		      		document.getElementById('formFeedback').innerHTML = "Error: Password does not fit requirements";
+		      		document.getElementById('newpassword').style.cssText = "border: 3px solid red";
+		      		document.getElementById('newpassword_conf').style.cssText = "border: 3px solid red";
+		      		return false;
+		      	}
+		      	else if(!name_regex.test(fname)){
+		      		document.getElementById('formFeedback').innerHTML = "Error: Name longer than 20 chars, or does not contain only letters";
+		      		document.getElementById('firstname').style.cssText = "border: 3px solid red";
+		      		return false;
+		      	}
+		      	else if(!name_regex.test(lname)){
+		      		document.getElementById('formFeedback').innerHTML = "Error: Name longer than 20 chars, or does not contain only letters";
+		      		document.getElementById('lastname').style.cssText = "border: 3px solid red";
+		      		return false;
+		      	}
+		      	else{
+		      		return true;
+		      	}
+		      }
 		</script>
 	</head>
 	<body>
@@ -59,23 +102,49 @@
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
 				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px; padding-top: 5px">
+					<h2 id="formFeedback"><?php 
+                          if (isset($_GET['err'])) {echo 'ERROR: Username - password not valid.'; }
+                        ?><h2>
                   <tr>
-                  	<td style="width:80px">Username:</td>
+                  	<td style="width:80px; text-align: right">Username:</td>
                   	<td ><input type="text" name="myusername" id="myusername" required ></td>
                   </tr>
                   <tr>
-                  	<td style="width:80px">Password:</td>
+                  	<td style="width:80px; text-align: right">Password:</td>
                   	<td><input type="password" name="mypassword" id="mypassword" required></td>
                   </tr>
                   <tr >
-                  	<td style="text-align: right"><input type="submit" name="submit" value="Login"></td>
+                  	<td style="text-align: center;" colspan="2"><input type="submit" name="submit" value="Login"></td>
             </form>
-                  	<td style="text-align: left;">
-                  		<form name="newUser" method="get" id="newUser" action="create_user.php" onsubmit=" ? ">
-                  			<input type="submit" name="newUser" value="Create New User" style="margin-top:15px">
-                  		</form>
-                  	</td>
-                  </tr>					
+                  </tr>	
+              <form method="post" id="new_user" action="create_user.php" onsubmit="return checkNewUser();">
+                  <tr>
+                  	<td style="width: 110px; text-align: right">New Username:</td>
+                  	<td><input type="text" name="newusername" id="newusername" required></td>
+                  	<td>Min 6, Max 50 Chars</td>                 	
+                  </tr>	
+                  <tr>
+                  	<td style="width: 110px; text-align: right">New Password:</td>
+                  	<td><input type="password" name="newpassword" id="newpassword" required></td>
+                  	<td> (More than 6 characters, Less than 32)</td>
+                  </tr>
+                  <tr>
+                  	<td style="width:130px; text-align: right">Confirm Password:</td>
+                  	<td><input type="password" name="newpassword_conf" id="newpassword_conf" required></td>
+                  </tr>
+                  <tr>
+                  	<td style="text-align: right">First Name:</td>
+                  	<td><input type="text" name="firstname" id="firstname" required></td>
+                  </tr>
+                  <tr>
+                  	<td style="text-align: right">Last Name:</td>
+                  	<td><input type="text" name="lastname" id="lastname" required></td>
+                  </tr>
+                  <tr>
+                  	<td colspan="2" style="text-align: center"><input type="submit" name="submit" value="Create New User"></td>
+                  </tr>
+
+              </form>			
 				</table>
 			<?php } ?>
 		</div>
