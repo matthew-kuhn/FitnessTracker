@@ -7,21 +7,60 @@
 		exit;
 	}
 
-	$newUsername = stripslashes($_POST['newUsername']);
-  $newUsername = $db->real_escape_string($newUsername);
+	$newUsername = stripslashes($_POST['newusername']);
+	$newUsername = $db->real_escape_string($newUsername);
 
-  $newPassword = stripslashes($_POST['newPassword']);
-  $newPassword = $db->real_escape_string($newPassword);
+	$newPassword = stripslashes($_POST['newpassword']);
+	$newPassword = $db->real_escape_string($newPassword);
 
-  $newPassword = hash('sha256', $newPassword);
+	$fname = stripslashes($_POST['firstname']);
+	$fname = $db->real_escape_string($fname);
 
-  $checkQuery = "SELECT * FROM USERS WHERE userName = ?";
+	$lname = stripslashes($_POST['lastname']);
+	$lname = $db->real_escape_string($lname);
 
-  $checkStmt = $db->prepare($checkQuery);
+	$newPassword = hash('sha256', $newPassword);
 
-  $checkStmt->bind_param("s", $newUsername);
+	$checkQuery = "SELECT * FROM User WHERE User_id = ?";
 
-  $checkStmt->execute();
+	$checkStmt = $db->prepare($checkQuery);
 
-  $checkStmt->store_result();
+	$checkStmt->bind_param("s", $newUsername);
+
+	$checkStmt->execute();
+
+	$checkStmt->store_result();
+
+	if ( ($checkStmt->errno <> 0) || ($checkStmt->num_rows > 0) )
+	{
+	$checkStmt->close();
+	header("location:index.php?newUserError=2");
+	exit;
+	}
+
+	$checkStmt->close();
+
+	// set up a prepared statement to insert the new user info
+
+	$query = "INSERT INTO User (User_id, Password, First_Name, Last_Name) VALUES ( ?, ?, ?, ?)";
+
+	$stmt = $db->prepare($query);
+
+	$stmt->bind_param("ssss", $newUsername, $newPassword, $fname, $lname);
+
+	$stmt->execute();
+
+	if ($stmt->errno <> 0)
+	{
+	$stmt->close();
+	$db->close();
+	header("location:index.php?newUserError=3");
+	exit;
+	}
+
+	$stmt->close();
+
+  	$db->close();
+
+	header("location:index.php?newUserSuccess=1");
 ?>

@@ -27,7 +27,7 @@
 		      	var fname = document.forms["new_user"]["firstname"].value;
 		      	var lname = document.forms["new_user"]["lastname"].value;
 		      	var pass_regex = new RegExp("^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,32}$");
-		      	var name_regex = new RegExp("^[a-zA-Z]{1,20}$");
+		      	var name_regex = new RegExp("^[a-zA-Z-]{1,20}$");
 		      	var username_regex = new RegExp("^[a-zA-Z0-9!@#\$%\^\&*\)\(+=._-]{6,50}$");
 
 		      	// alert(username);
