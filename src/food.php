@@ -19,6 +19,11 @@
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
+			function pageUpdate(){
+				
+			}
+
+
 			function planAction(action){
 				if(action == "food.php"){
 					alert(action);
