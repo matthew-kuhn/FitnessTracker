@@ -19,7 +19,7 @@
 
 		$mypassword = hash('sha256', $mypassword);
 
-		$query = "SELECT * FROM USER WHERE (User_id = ?) AND (Password = ?)";
+		$query = "SELECT * FROM USER WHERE (UserID = ?) AND (Password = ?)";
 
 		$stmt = $db->prepare($query);
 

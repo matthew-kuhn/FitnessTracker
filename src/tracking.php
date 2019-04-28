@@ -34,7 +34,7 @@
 				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
-		<div id="Weekly_Summary" style="margin: 0 auto; width: 50%;">
+		<div id="Weekly_Summary" style="margin: 0 auto; width: 66%;">
 			<h2>The Week So Far</h2>
 				<table style="margin: auto;">
 					<tr>
@@ -59,7 +59,7 @@
 					</tr>
 				</table>
 		</div>
-		<div id="Tracking_Input" style="margin: 0 auto; width: 50%;">
+		<div id="Tracking_Input" style="margin: 0 auto; width: 66%;">
 			<h2>Today's Tracking</h2>
 				<form id="tracker" method="post" action="" onsubmit="return checkForm()">
 					<table style="margin: 0 auto">

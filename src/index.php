@@ -104,6 +104,7 @@
 				<table border="0" cellpadding="3" cellspacing="1" style="margin-left: 400px; padding-top: 5px">
 					<h2 id="formFeedback"><?php 
                           if (isset($_GET['err'])) {echo 'ERROR: Username - password not valid.'; }
+                          if (isset($_GET['newUserSuccess'])) {echo'New User created successfully';}
                         ?><h2>
                   <tr>
                   	<td style="width:80px; text-align: right">Username:</td>

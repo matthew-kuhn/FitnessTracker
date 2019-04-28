@@ -21,7 +21,7 @@
 
 	$newPassword = hash('sha256', $newPassword);
 
-	$checkQuery = "SELECT * FROM User WHERE User_id = ?";
+	$checkQuery = "SELECT * FROM User WHERE UserID = ?";
 
 	$checkStmt = $db->prepare($checkQuery);
 
@@ -42,7 +42,7 @@
 
 	// set up a prepared statement to insert the new user info
 
-	$query = "INSERT INTO User (User_id, Password, First_Name, Last_Name) VALUES ( ?, ?, ?, ?)";
+	$query = "INSERT INTO User (UserID, Password, First_Name, Last_Name) VALUES ( ?, ?, ?, ?)";
 
 	$stmt = $db->prepare($query);
 

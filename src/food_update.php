@@ -1,9 +1,11 @@
 <?php
+	
+	session_start()''
 
 	function getPlan($planName){
 		global $db;
 
-		$query = "SELECT * FROM IN_NUTPLAN WHERE NUT_PLAN_NAME = ? ORDER BY Day ASC, Meal_num DESC;"
+		$query = "SELECT * FROM IN_NUTPLAN WHERE NUT_PLAN_NAME = ? ORDER BY Day ASC, Meal_num DESC;";
 
 		$statement = $db->prepare($query);
 
@@ -11,8 +13,6 @@
 		$statement->bind_param(str_repeat('s', count($params)), ...$params);
 		}
 		$statement->execute();
-
-		$data = array();
 
 		$results = $statement->get_result();
 
@@ -23,11 +23,22 @@
 	function changeMealPlan($planName){
 		global $db;
 
-		$query = ""
+		$query = "UPDATE User SET NPlan = ? WHERE UserID = ?;";
+
+		$statement = $db->prepare($query);
+
+		$statement->bind_param("ss", $planName, $_SESSION['username']);
+		$statement->execute();
+
+		$results = $statement->execute();
+
+		return $results;
 	}
 
 	function createPlan($plan){
+		global $db;
 
+		$query
 	}
 
 	function createMeal($meal){

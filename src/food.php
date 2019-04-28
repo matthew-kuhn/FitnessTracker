@@ -20,7 +20,7 @@
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
 			function pageUpdate(){
-				
+
 			}
 
 
@@ -49,28 +49,28 @@
 				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
-		<div id="grocery_list" style="float:left; width: 48%; margin-top: 15px; margin-bottom: 15px">
-			<h2 style="margin-top: 0px">Your Grocery List</h2>
-				<ul style="float:left; left: 50%; position: relative;">
-					<li style="float:left; right: 50%; position: relative; clear: both"><?php echo "chicken breast 12 oz"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both"><?php echo "turkey breast 12 oz"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both"><?php echo "chicken wing 12 oz"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both"><?php echo "turkey wing 12 oz"?></li>
+		<div id="grocery_list" style="text-align: center; width: 66%">
+			<h2>Your Grocery List</h2>
+			<ul style="display: inline-block; list-style: none">
+					<li><?php echo "chicken breast 12 oz"?></li>
+					<li><?php echo "turkey breast 12 oz"?></li>
+					<li><?php echo "chicken wing 12 oz"?></li>
+					<li><?php echo "turkey wing 12 oz"?></li>
 				</ul>
 		</div>
-		<div id="weekly_meals" style="float:right; width: 48%; margin-top: 15px; margin-bottom: 15px">
-			<h2 style="margin-top: 0px">Your Weekly Menu</h2>
-				<ul style="float:left; left: 50%; position: relative;">
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 1: <?php echo "baked chicken breast every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 2: <?php echo "baked turkey breast every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 3: <?php echo "baked chicken wing every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 4: <?php echo "baked turkey wing every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 5: <?php echo "baked chicken breast every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 6: <?php echo "baked chicken wing every meal"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 7: <?php echo "baked turkey breast every meal"?></li>
+		 <div id="weekly_meals" style="text-align:center; width:66%">
+			<h2 >Your Weekly Menu</h2>
+			<ul style="display: inline-block; list-style: none ">
+					<li>Day 1: <?php echo "baked chicken breast every meal"?></li>
+					<li>Day 2: <?php echo "baked turkey breast every meal"?></li>
+					<li>Day 3: <?php echo "baked chicken wing every meal"?></li>
+					<li>Day 4: <?php echo "baked turkey wing every meal"?></li>
+					<li>Day 5: <?php echo "baked chicken breast every meal"?></li>
+					<li>Day 6: <?php echo "baked chicken wing every meal"?></li>
+					<li>Day 7: <?php echo "baked turkey breast every meal"?></li>
 				</ul>
 		</div>
-		<div id="meal_plans" style="clear: both; width: 50%;">
+		<div id="meal_plans" style="width:66%">
 			<h2>Current Meal Plan <!-- This is where  we will print the name from the DB--></h3>
 				<form name="mealPlan" method="?" id="mealPlan" action="" onsubmit="return planAction('food.php')" style="margin: auto;">
 					<!-- populate this select with all existing meal plans -->
@@ -85,6 +85,6 @@
 				<form name="newPlan" id ="newPlan" method="?" action="" onsubmit="return planAction('food_plan.php')">
 					<input type="submit" name="submit" value="Create New Plan" style="display: block; margin: 0 auto">
 				</form>
-		</div>
+		</div> 
 	</body>
 </html>

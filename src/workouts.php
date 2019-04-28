@@ -41,18 +41,18 @@
 				<a style="float: right" href="logout.php">Sign Out</a>
 			</nav>
 		</header>
-		<div id="weekly" style="float:left; width: 48%; margin-top: 15px; margin-bottom: 15px">
+		<div id="weekly" style="text-align: center; width: 66%">
 			<h2><?php echo("Week Overview") ?></h2>
 			<!-- this will be connected to the database and use php to display the weekly overview -->
-				<ul style="float:left; left: 50%; position: relative;">
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 1: <?php echo "Chest and shoulders"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 2: <?php echo "3 Mile run"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 3: <?php echo "Back and legs"?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 4: <?php echo "10 sprint intervals" ?></li>
-					<li style="float:left; right: 50%; position: relative; clear: both">Day 5: <?php echo "Legs"?></li>
+				<ul style="display: inline-block; list-style: none">
+					<li>Day 1: <?php echo "Chest and shoulders"?></li>
+					<li>Day 2: <?php echo "3 Mile run"?></li>
+					<li>Day 3: <?php echo "Back and legs"?></li>
+					<li>Day 4: <?php echo "10 sprint intervals" ?></li>
+					<li>Day 5: <?php echo "Legs"?></li>
 				</ul>
 		</div>
-		<div id="monthly" style="float:right; width: 48%; margin-top: 15px; margin-bottom: 15px">
+		<div id="monthly" style="text-align: center; width: 66%">
 			<h2>Workout Close View</h2>
 			<!-- this will be changed based on which day from the left panel gets clicked -->
 				<table style="margin: auto; border-spacing: 10px; table-layout: fixed;">
@@ -89,7 +89,7 @@
 					</tr>
 				</table>
 		</div>
-		<div id="planSelect" style="clear: both; width: 50%;">
+		<div id="planSelect" style="text-align: center; width: 66%">
 			<h2>Current Workout Plan</h2>
 			<form name="existingPlan" method="?" action="" onsubmit="return changePlans('existing')" style="margin: auto;">
 				<select style="display: block; margin: 0 auto; margin-top: 5px; margin-bottom: 5px;">
