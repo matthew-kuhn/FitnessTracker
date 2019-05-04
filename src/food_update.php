@@ -41,8 +41,22 @@
 
 		$newdata = array();
 
+		// for($i = 0; $i < count($data); $i++){
+		// 	$newdata[$data[$i]['Ingredient_Name']] = $data[$i]['Amount'];
+		// }
+
+		$query2 = "SELECT Ingredient_Name, Unit, Amount*? As Total From ingredient where Ingredient_Name = ?;";
+
 		for($i = 0; $i < count($data); $i++){
-			$newdata[$data[$i]['Ingredient_Name']] = $data[$i]['Amount'];
+			$statement2 = $db->prepare($query2);
+			$statement2->bind_param("is", $data[$i]['Amount'], $data[$i]['Ingredient_Name']);
+			$statement2->execute();
+
+			$results = $statement2->get_result();
+
+			while ($row = $results->fetch_assoc()) {
+				array_push($newdata, $row);
+			}
 		}
 
 		return $newdata;
@@ -63,17 +77,7 @@
 		return $results;
 	}
 
-	function createPlan($plan){
-		global $db;
-
-		$query = "INSERT INTO `Nutrition Plan` (Nutrition_Plan_Name) VALUES ?;";
-
-		$meals = "INSERT INTO IN_NUTPLAN (Nut_Plan_Name, M_Name, Day, Meal_num) Values (?,?,?,?);";
-	}
-
-	function createMeal($meal){
-
-	}
+	
 
 	function getMeal($mealName){
 		global $db;
@@ -89,9 +93,7 @@
 		
 	}
 
-	function createIngredient($ingredient){
-
-	}
+	
 
 	function getIngredient($ingredientName){
 		global $db;
@@ -104,10 +106,6 @@
 		$statement->execute();
 
 		$results = $statement->get_result();
-	}
-
-	function createRecipe($recipe){
-
 	}
 
 	function getRecipe($recipe){
@@ -127,53 +125,12 @@
 
 	header('Content-Type: application/json');
 	switch($_SERVER['REQUEST_METHOD']){
-		case 'GET':
-			if(isset($_REQUEST['planName']) && 0 < strlen($_REQUEST['planName'])){
-				$data = getPlan($_REQUEST['planName']);
-				changeMealPlan($_REQUEST['planName']);
-				if(!isset($data)){
-					http_response_code(404);
-					die();
-				}
-			}
-			else if (isset($_REQUEST['ingredientList']) && 0 < strlen($_REQUEST['ingredientList']) && isset($_REQUEST['mealName']) && 0 < strlen($_REQUEST['mealName'])) {
-				$data = getRecipe($_REQUEST['recipeName']);
-				if(!isset($data)){
-					http_response_code(404);
-					die();
-				}
-			}
-			else if(isset($_REQUEST['mealName']) && 0 < strlen($_REQUEST['mealName'])){
-				$data = getMeal($_REQUEST['mealName']);
-				if(!isset($data)){
-					http_response_code(404);
-					die();
-				}
-			}
-			else if(isset($_REQUEST['ingredientName']) && 0 < strlen($_REQUEST['ingredientName'])){
-				$data = getIngredient($_REQUEST['ingredientName']);
-				if(!isset($data)){
-					http_response_code(404);
-					die();
-				}
-			}
-			if(!isset($data)){
-				http_response_code(404);
-				die();
-			}
-
-			echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-			break;
-
+		
 		case 'POST':
 			$data = json_decode(file_get_contents('php://input'), true);
 
 				
-			if(isset($_REQUEST['plan']) && strlen($_REQUEST['plan']) > 0){
-				createPlan($plan);
-				http_response_code(201);
-			}
-			else if(isset($data['planName']) && 0 < strlen($data['planName'])){
+			if(isset($data['planName']) && 0 < strlen($data['planName'])){
 
 				changeMealPlan($data['planName']);
 
@@ -190,20 +147,7 @@
 				echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 				
 			}
-			else if(isset($_REQUEST['meal']) && strlen($_REQUEST['meal']) > 0){
-				createMeal($meal);
-				http_response_code(201);
-			}
-			else if(isset($_REQUEST['ingredient']) && strlen($_REQUEST['ingredient']) > 0){
-				createIngredient($ingredient);
-				http_response_code(201);
-			}
-			else if(isset($_REQUEST['recipe']) && strlen($_REQUEST['recipe']) > 0){
-				$recipe = json_decode(file_get_contents('php://input'), true);
-				createRecipe($recipe);
-				http_response_code(201);
-			}
-			// http_response_code(201);
+			
 			break;
 
 	}
