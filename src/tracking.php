@@ -1,12 +1,39 @@
 <?php
 
-			  // retrieve session information
-			  session_start();
+			// retrieve session information
+			session_start();
 
-			  // if no username set, then redirect to login
-			  if(!isset($_SESSION['myusername'])){
-			  	header("location:index.php");
-			  }
+			// if no username set, then redirect to login
+			if(!isset($_SESSION['myusername'])){
+				header("location:index.php");
+			}
+
+			if(isset($_SESSION['myusername'])){
+			@ $db = new mysqli('localhost', 'root', '', 'FitnessTracker');
+
+			if (mysqli_connect_errno()) 
+             { 
+               echo 'ERROR: Could not connect to database.  Error is '.mysqli_connect_error();
+               exit;
+             }
+
+			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date limit 7";
+
+			$statement = $db->prepare($query);
+			$statement->bind_param('s', $_SESSION['myusername']);
+			$statement->execute(); 
+			$results = $statement->get_result();
+
+			if(!isset($results)){
+				$tracked = false;
+			}
+			else{
+				$tracked = true;
+				$days = array();
+				while ($row = $results->fetch_assoc()) {
+					array_push($days, $row);
+				}
+			}
 
 ?>
 <html lang="en-US">
@@ -18,9 +45,7 @@
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
-			 function checkForm(){
 
-			 }
 		</script>
 	</head>
 	<body>
@@ -35,6 +60,17 @@
 			</nav>
 		</header>
 		<div id="Weekly_Summary" style="margin: 0 auto; width: 66%;">
+			<?php
+
+			if(!$tracked){
+
+			?>	
+			<h2>Start Tracking Today!</h2>
+			<?php
+
+			}else{
+
+			?>
 			<h2>The Week So Far</h2>
 				<table style="margin: auto;">
 					<tr>
@@ -42,40 +78,47 @@
 						<th style="text-align: left">Calories</th>
 						<th style="text-align: left">Weight (lbs)</th>
 					</tr>
-					<tr>
-						<td>Monday</td>
-						<td style="text-align: right">1900</td>
-						<td style="text-align: right">157</td>
-					</tr>
-					<tr>
-						<td>Tuesday</td>
-						<td style="text-align: right">2150</td>
-						<td style="text-align: right">156</td>
-					</tr>
-					<tr>
-						<td>Wednesday</td>
-						<td style="text-align: right">2000</td>
-						<td style="text-align: right">157</td>
-					</tr>
+					<?php
+						for($i = 0; $i < count($days); $i++){
+							print "<tr><td>".substr($days[$i]['Date'], 0, 10)."</td><td>".$days[$i]['Calories']."</td><td>".$days[$i]['Weight']."</td></tr>";
+						}
+
+
+					?>
 				</table>
+			<?php
+
+			}
+
+			?>
 		</div>
 		<div id="Tracking_Input" style="margin: 0 auto; width: 66%;">
 			<h2>Today's Tracking</h2>
-				<form id="tracker" method="post" action="" onsubmit="return checkForm()">
+				<form id="tracker" method="post" action="track_update.php" onsubmit="return checkForm()">
+					<h2 id="formFeedback">
+						<?php
+						if(isset($_GET['TrackError'])){print "There was an error with the database";}
+						if(isset($_GET['TrackSuccess'])){print "Tracked Successfully";}
+						?>
+					</h2>
 					<table style="margin: 0 auto">
 						<tr>
 							<td>Calories:</td>
-							<td><input type="text" name="cals"></td>
+							<td><input type="number" name="cals" required></td>
 						</tr>
 						<tr>
 							<td>Weight:</td>
-							<td><input type="text" name="weight"></td>
+							<td><input type="number" step=".1" name="weight" required></td>
 						</tr>
 						<tr>
-							<td colspan="2" style="text-align: center"><input type="submit" name="submit" value="Record Data"></td>
+							<td colspan="2" style="text-align: center" id="dateRow"><input type="date" name="date" id="date" required></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="text-align: center"><input type="submit" value="Record Data"></td>
 						</tr>
 					</table>
 				</form>
 		</div>
 	</body>
 </html>
+<?php } ?>

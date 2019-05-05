@@ -91,6 +91,7 @@
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
 		<script type="text/javascript">
+			var numExercise = 1;
 			function pageUpdate(){
 				var url = "workout_update.php";
 				var request = new XMLHttpRequest();
@@ -163,6 +164,53 @@
 				content = JSON.stringify(content);
 				request.open('POST', url, true);
         		request.send(content);
+			}
+
+			function addExercise(){
+				var table = document.getElementById('workout_maker');
+				var row = table.insertRow(table.rows.length-3);
+				row.id = 'Exercise'+numExercise;
+				var cell1 = row.insertCell(0);
+				var cell2 = row.insertCell(1);
+				var cell3 = row.insertCell(2);
+				var cell4 = row.insertCell(3);
+				cell1.innerHTML = "Exercise "+(numExercise+1)+":";
+				cell2.innerHTML = "<select id='Exercise"+numExercise+"select' name='Exercise["+numExercise+"][name]'>";
+				cell3.innerHTML = "Reps:<input type='number' name='Exercise["+numExercise+"][reps]' required>";
+				cell4.innerHTML = "Sets:<input type='number' name='Exercise["+numExercise+"][Sets]' required>";
+				var exercises = <?php echo json_encode($exercises); ?>;
+				for(var i = 0; i < exercises.length; i ++){
+					document.getElementById('Exercise'+numExercise+'select').innerHTML += "<option>"+exercises[i]['Exercise_Name']+"</option>";
+				}
+				numExercise += 1;
+			}
+
+			function removeExercise(){
+				if(numExercise > 1){
+					numExercise -= 1;
+					var element = document.getElementById('Exercise' + numExercise);
+					element.parentNode.removeChild(element);	
+				}
+			}
+
+			function addWorkout(day){
+				var row = document.getElementById(day);
+				row.innerHTML = "";
+				var cell1 = row.insertCell(0);
+				var cell2 = row.insertCell(1);
+				var cell3 = row.insertCell(2);
+				cell1.innerHTML = "Choose a workout:";
+				cell3.innerHTML = "<input type='button' value='Remove Workout' onclick='removeWorkout("+day+")'>";
+				var workouts = <?php echo json_encode($allWorkouts) ?>;
+				cell2.innerHTML = "<select id='"+day+"select' name='Workout['"+day+"][name]>";
+				for(var i = 0; i < workouts.length; i++){
+					document.getElementById(day+'select').innerHTML+="<option>"+workouts[i]["Workout_Name"]+"</option>";
+				}
+			}
+
+			function removeWorkout(day){
+				var row = document.getElementById(day);
+				row.innerHTML = "<td style='text-align: right'><input type='button' id='"+day+"btn' Value='Add Workout' onclick='addWorkout("+day+")''></td>";
 			}
 		</script>
 	</head>
@@ -281,7 +329,7 @@
 		<div id='workout_creator' style="text-align: center; width:66%">
 			<h2>Create a New Workout</h2>
 			<form method="post" action="create_workout.php">
-				<table style="margin:auto">
+				<table style="margin:auto" id="workout_maker">
 					<tr>
 						<td></td>
 						<td>Workout Name:</td>
@@ -297,23 +345,85 @@
 					<tr>
 						<td>Exercise 1:</td>
 						<td>
-							<select name="Exercise[0]">
-								
+							<select name="Exercise[0][name]">
+								<?php
+								for($i = 0; $i <count($exercises); $i++){
+									print "<option>".$exercises[$i]['Exercise_Name']."</option>";
+								}
+								?>
 							</select>
 						</td>
-						<td><input type="number" name=""></td>
+						<td>Reps:<input type="number" name="Exercise[0][reps]" required></td>
+						<td>Sets:<input type="number" name="Exercise[0][sets]" required></td>
 					</tr>
 					<tr>
+						<td></td>
+						<td colspan="2" style="text-align:center"><input type="button" value="Add Exercise" onclick="addExercise()"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2" style="text-align: center"><input type="button" value="Remove Exercise" onclick="removeExercise()"></td>
+					</tr>
+					<tr>
+						<td></td>
 						<td colspan="2" style="text-align:center"><input type="submit" name="submit"></td>
 					</tr>
 				</table>
 			</form>			
 		</div>
 		<div id="plan_creator" style="text-align: center; width:66%">
+			<h2>Create a New Plan</h2>
+			<h3>You may only use the same workout once per week</h3>
 			<form method="post" action="create_workout.php">
-				<table>
+				<table style="margin:auto" id="plan_maker">
 					<tr>
-						<td></td>
+						<th style="text-align: left">Sunday:</th>
+					</tr>
+					<tr id="1">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(1)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Monday:</th>
+					</tr>
+					<tr id='2'>
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(2)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Tuesday:</th>
+					</tr>
+					<tr id="3">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(3)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Wednesday:</th>
+					</tr>
+					<tr id="4">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(4)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Thursday:</th>
+					</tr>
+					<tr id="5">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(5)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Friday:</th>
+					</tr>
+					<tr id="6">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(6)"></td>
+					</tr>
+					<tr>
+						<th style="text-align: left">Saturday:</th>
+					</tr>
+					<tr id="7">
+						<td style="text-align: right"><input type="button" id="1btn" Value="Add Workout" onclick="addWorkout(7)"></td>
+					</tr>
+					<tr>
+						<td colspan="2" style="text-align:center">Plan Name:</td>
+						<td colspan="1" style="text-align:center"><input type="text" name="Plan_Name" required maxlength="50"></td>
+					</tr>
+					<tr>
+						<td colspan="3" style="text-align:center"><input type="submit"></td>
 					</tr>
 				</table>				
 			</form>
