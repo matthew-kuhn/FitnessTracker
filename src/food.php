@@ -471,6 +471,90 @@
 					</select>
 					<input type="submit" name="submit1" value="Select Plan" onclick="pageUpdate('POST')" style="display: block; margin: 0 auto; margin-bottom: 5px">
 		</div>
+		<div id="ingredientCreator" style="width: 66%">
+			<h2>Create a New Ingredient</h2>
+			<h2 id="formFeedback"><?php
+				if(isset($_GET['IngredientError'])){ print "Error Creating Ingredent";}
+				if(isset($_GET['IngredientCreation'])){print "Ingredient Creation Success";}
+			?>	
+			</h2>
+			<form method="post" action="create_food.php">
+				<table style="margin: auto">
+					<tr>
+						<td>Name:</td>
+						<td><input type="text" name="Ingredient_Name" required maxlength="50"></td>
+					</tr>
+					<tr>
+						<td>Unit</td>
+						<td><input type="text" name="Unit" required maxlength="15"></td>
+						<td>(ex. Oz or Lb)</td>
+					</tr>
+					<tr>
+						<td>Price/Unit:</td>
+						<td><input type="number" name="Price/unit" step=".01" required></td>
+						<td>(ex. .4 for 40 cents/Lb)</td>
+					</tr>
+					<tr>
+						<td>Serving Size:</td>
+						<td><input type="number" name="Amount" required></td>
+						<td>(ex. if unit is Oz and serving size is 8 Oz, enter 8)</td>
+					</tr>
+					<tr>
+						<td colspan="3" style="text-align: center"><input type="Submit" name="Submit"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="mealCreator" style="width: 66%">
+			<h2>Create a New Meal</h2>
+			<h2 id="formFeedback"><?php
+				if(isset($_GET['MealError'])){ print "Error Creating Meal";}
+				if(isset($_GET['foodCreation'])){print "Meal Creation Success";}
+			?>	
+			</h2>
+			<form method="post" action="create_food.php">
+				<table id="mealMaker" style="margin:auto">
+					<tr>
+						<td>Meal Name:</td>
+						<td><input type="text" name="Meal_Name" required maxlength="50"></td>
+						<td>Protein (g):</td>
+						<td><input type="number" name="Protein" required></td>
+					</tr>
+					<tr>
+						<td>Fat (g):</td>
+						<td><input type="number" name="Fat" required></td>
+						<td>Carbs (g):</td>
+						<td><input type="number" name="Carbs" required></td>
+					</tr>
+					<tr>
+						<td>Ingredient 1:</td>
+						<td>
+							<select name="Ingredient1">
+								<?php
+								for($i = 0; $i < count($ingredients); $i++){
+									print "<option>".$ingredients[$i]['Ingredient_Name']."</option>";
+								}
+								?>
+							</select>
+						</td>
+						<td>Servings:</td>
+						<td><input type="number" name="Ingredient1Servings" required></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2" style="text-align: center"><input type="button" name="Add Ingredient" value="Add ingredient" onclick="addIngredient()"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2" style="text-align: center"><input type="button" name="Remove Ingredient" value="Remove Ingredient" onclick="removeIngredient()"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td colspan="2" style="text-align: center"><input type="submit" name="Submit"></td>
+					</tr>
+				</table>
+			</form>
+		</div>
 		<div id="planCreator" style="width:66%">
 			<h2>Create a New Meal Plan</h2>
 			<h3>Variety is the spice of life, use each meal only once</h3>
@@ -808,89 +892,5 @@
 				</table>
 			</form>
 		</div> 
-		<div id="mealCreator" style="width: 66%">
-			<h2>Create a New Meal</h2>
-			<h2 id="formFeedback"><?php
-				if(isset($_GET['MealError'])){ print "Error Creating Meal";}
-				if(isset($_GET['foodCreation'])){print "Meal Creation Success";}
-			?>	
-			</h2>
-			<form method="post" action="create_food.php">
-				<table id="mealMaker" style="margin:auto">
-					<tr>
-						<td>Meal Name:</td>
-						<td><input type="text" name="Meal_Name" required></td>
-						<td>Protein (g):</td>
-						<td><input type="number" name="Protein" required></td>
-					</tr>
-					<tr>
-						<td>Fat (g):</td>
-						<td><input type="number" name="Fat" required></td>
-						<td>Carbs (g):</td>
-						<td><input type="number" name="Carbs" required></td>
-					</tr>
-					<tr>
-						<td>Ingredient 1:</td>
-						<td>
-							<select name="Ingredient1">
-								<?php
-								for($i = 0; $i < count($ingredients); $i++){
-									print "<option>".$ingredients[$i]['Ingredient_Name']."</option>";
-								}
-								?>
-							</select>
-						</td>
-						<td>Servings:</td>
-						<td><input type="number" name="Ingredient1Servings" required></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td colspan="2" style="text-align: center"><input type="button" name="Add Ingredient" value="Add ingredient" onclick="addIngredient()"></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td colspan="2" style="text-align: center"><input type="button" name="Remove Ingredient" value="Remove Ingredient" onclick="removeIngredient()"></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td colspan="2" style="text-align: center"><input type="submit" name="Submit"></td>
-					</tr>
-				</table>
-			</form>
-		</div>
-		<div id="ingredientCreator" style="width: 66%">
-			<h2>Create a New Ingredient</h2>
-			<h2 id="formFeedback"><?php
-				if(isset($_GET['IngredientError'])){ print "Error Creating Ingredent";}
-				if(isset($_GET['IngredientCreation'])){print "Ingredient Creation Success";}
-			?>	
-			</h2>
-			<form method="post" action="create_food.php">
-				<table style="margin: auto">
-					<tr>
-						<td>Name:</td>
-						<td><input type="text" name="Ingredient_Name" required></td>
-					</tr>
-					<tr>
-						<td>Unit</td>
-						<td><input type="text" name="Unit" required></td>
-						<td>(ex. Oz or Lb)</td>
-					</tr>
-					<tr>
-						<td>Price/Unit:</td>
-						<td><input type="number" name="Price/unit" step=".01" required></td>
-						<td>(ex. .4 for 40 cents/Lb)</td>
-					</tr>
-					<tr>
-						<td>Serving Size:</td>
-						<td><input type="number" name="Amount" required></td>
-						<td>(ex. if unit is Oz and serving size is 8 Oz, enter 8)</td>
-					</tr>
-					<tr>
-						<td colspan="3" style="text-align: center"><input type="Submit" name="Submit"></td>
-					</tr>
-				</table>
-			</form>
-		</div>
 	</body>
 </html>
