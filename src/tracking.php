@@ -62,6 +62,33 @@
 				<p style="float: right"><?php echo $_SESSION['myusername'];?></p>
 			</nav>
 		</header>
+		<div id="Tracking_Input" style="margin: 0 auto; width: 66%;">
+			<h2>Today's Tracking</h2>
+				<form id="tracker" method="post" action="track_update.php" onsubmit="return checkForm()">
+					<h2 id="formFeedback">
+						<?php
+						if(isset($_GET['TrackError'])){print "There was an error with the database";}
+						if(isset($_GET['TrackSuccess'])){print "Tracked Successfully";}
+						?>
+					</h2>
+					<table style="margin: 0 auto">
+						<tr>
+							<td>Calories:</td>
+							<td><input type="number" name="cals" required></td>
+						</tr>
+						<tr>
+							<td>Weight:</td>
+							<td><input type="number" step=".1" name="weight" required></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="text-align: center" id="dateRow"><input type="date" name="date" id="date" required></td>
+						</tr>
+						<tr>
+							<td colspan="2" style="text-align: center"><input type="submit" value="Record Data"></td>
+						</tr>
+					</table>
+				</form>
+		</div>
 		<div id="Weekly_Summary" style="margin: 0 auto; width: 66%;">
 			<?php
 
@@ -193,33 +220,6 @@
 			}
 
 			?>
-		</div>
-		<div id="Tracking_Input" style="margin: 0 auto; width: 66%;">
-			<h2>Today's Tracking</h2>
-				<form id="tracker" method="post" action="track_update.php" onsubmit="return checkForm()">
-					<h2 id="formFeedback">
-						<?php
-						if(isset($_GET['TrackError'])){print "There was an error with the database";}
-						if(isset($_GET['TrackSuccess'])){print "Tracked Successfully";}
-						?>
-					</h2>
-					<table style="margin: 0 auto">
-						<tr>
-							<td>Calories:</td>
-							<td><input type="number" name="cals" required></td>
-						</tr>
-						<tr>
-							<td>Weight:</td>
-							<td><input type="number" step=".1" name="weight" required></td>
-						</tr>
-						<tr>
-							<td colspan="2" style="text-align: center" id="dateRow"><input type="date" name="date" id="date" required></td>
-						</tr>
-						<tr>
-							<td colspan="2" style="text-align: center"><input type="submit" value="Record Data"></td>
-						</tr>
-					</table>
-				</form>
 		</div>
 	</body>
 </html>

@@ -5,11 +5,11 @@
 	if(mysqli_connect_errno()){
 		echo 'Error: could not connect to database, code: '.mysqli_connect_errno();
 		exit;
-	}
+	}	
 
 	#create new plan
 	if(isset($_POST['Plan_Name'])){
-		$query = "INSERT INTO `Workout Plan` (Workout_Plan_Name) VALUES ?;";
+		$query = "INSERT INTO `Workout Plan` (Workout_Plan_Name) VALUES (?);";
 
 		$planName = stripslashes($_POST["Plan_Name"]);
 		$planName = $db->real_escape_string($planName);
@@ -30,7 +30,7 @@
 		$keys = array_keys($_POST['Workout']);
 		for($i = 0; $i < count($keys); $i++){
 			$statement = $db->prepare($query);
-			$statement->bind_param("ssi", $_POST['Workout'][$keys[$i]]['name'], $planName, $_POST['Workout'][$keys[$i]]);
+			$statement->bind_param("ssi", $_POST['Workout'][$keys[$i]]['name'], $planName, $keys[$i]);
 			$statement->execute();
 			if ($statement->errno <> 0)
 			{

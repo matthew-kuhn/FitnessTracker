@@ -25,6 +25,36 @@
 			$statement->bind_result($_SESSION['WPlan']);
 			$statement->fetch();
 
+			$query = "SELECT * FROM `Workout Plan`;";
+			$plans = array();
+			$statement = $db->prepare($query);
+			$statement->execute();
+			$results = $statement->get_result();
+
+			while ($row = $results->fetch_assoc()) {
+				array_push($plans, $row);
+			}
+
+			$query = "SELECT Exercise_Name FROM Exercise;";
+
+			$statement = $db->prepare($query);
+			$statement->execute();
+			$results = $statement->get_result();
+			$exercises = array();
+			while($row = $results->fetch_assoc()){
+				array_push($exercises, $row);
+			}
+
+			$query = "SELECT Workout_Name From Workout;";
+		
+			$statement = $db->prepare($query);
+			$statement->execute();
+			$results = $statement->get_result();
+			$allWorkouts = array();
+			while($row = $results->fetch_assoc()){
+				array_push($allWorkouts, $row);
+			}
+
 			if(strlen($_SESSION['WPlan']) > 1){
 				$query = "SELECT * FROM IN_Wplan WHERE WPlan_Name = ? Order by Day Asc;";
 				$statement = $db->prepare($query);
@@ -35,36 +65,6 @@
 
 				while ($row = $results->fetch_assoc()) {
 					array_push($plan, $row);
-				}
-				
-				$query = "SELECT * FROM `Workout Plan`;";
-				$plans = array();
-				$statement = $db->prepare($query);
-				$statement->execute();
-				$results = $statement->get_result();
-
-				while ($row = $results->fetch_assoc()) {
-					array_push($plans, $row);
-				}
-
-				$query = "SELECT Exercise_Name FROM Exercise;";
-
-				$statement = $db->prepare($query);
-				$statement->execute();
-				$results = $statement->get_result();
-				$exercises = array();
-				while($row = $results->fetch_assoc()){
-					array_push($exercises, $row);
-				}
-
-				$query = "SELECT Workout_Name From Workout;";
-			
-				$statement = $db->prepare($query);
-				$statement->execute();
-				$results = $statement->get_result();
-				$allWorkouts = array();
-				while($row = $results->fetch_assoc()){
-					array_push($allWorkouts, $row);
 				}
 
 				$query = "SELECT Session.Exercise_Name as Exercise_Name, Exercise_Desc, Reps, Sets FROM Session, Exercise where session.exercise_name = exercise.exercise_name AND workout_name = ?;";
@@ -202,7 +202,7 @@
 				cell1.innerHTML = "Choose a workout:";
 				cell3.innerHTML = "<input type='button' value='Remove Workout' onclick='removeWorkout("+day+")'>";
 				var workouts = <?php echo json_encode($allWorkouts) ?>;
-				cell2.innerHTML = "<select id='"+day+"select' name='Workout['"+day+"][name]>";
+				cell2.innerHTML = "<select id='"+day+"select' name='Workout["+day+"][name]'>";
 				for(var i = 0; i < workouts.length; i++){
 					document.getElementById(day+'select').innerHTML+="<option>"+workouts[i]["Workout_Name"]+"</option>";
 				}
@@ -373,7 +373,6 @@
 		</div>
 		<div id="plan_creator" style="text-align: center; width:66%">
 			<h2>Create a New Plan</h2>
-			<h3>You may only use the same workout once per week</h3>
 			<form method="post" action="create_workout.php">
 				<table style="margin:auto" id="plan_maker">
 					<tr>

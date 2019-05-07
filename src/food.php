@@ -26,6 +26,42 @@
 			$statement->bind_result($_SESSION['NPlan']);
 			$statement->fetch();
 
+			$query = "SELECT * from `Nutrition Plan`;";
+
+			$plans = array();
+
+			$statement = $db->prepare($query);
+			$statement->execute();
+
+			$results = $statement->get_result();
+
+			while ($row = $results->fetch_assoc()) {
+				array_push($plans, $row);
+			}
+
+
+			$query = "SELECT Ingredient_Name FROM Ingredient;";
+
+			$statement = $db->prepare($query);
+			$statement->execute();
+
+			$results = $statement->get_result();
+			$ingredients = array();
+			while($row = $results->fetch_assoc()){
+				array_push($ingredients, $row);
+			}
+
+			$query = "SELECT Meal_Name From Meal;";
+			
+			$statement = $db->prepare($query);
+			$statement->execute();
+
+			$results = $statement->get_result();
+			$meals = array();
+			while($row = $results->fetch_assoc()){
+				array_push($meals, $row);
+			}
+
 			if(strlen($_SESSION['NPlan']) > 1){
 
 			$query = "SELECT * FROM IN_NUTPLAN WHERE NUT_PLAN_NAME = ? ORDER BY Day ASC, Meal_num ASC;";
@@ -70,43 +106,6 @@
 					array_push($newdata, $row);
 				}
 			}
-
-			$query = "SELECT * from `Nutrition Plan`;";
-
-			$plans = array();
-
-			$statement = $db->prepare($query);
-			$statement->execute();
-
-			$results = $statement->get_result();
-
-			while ($row = $results->fetch_assoc()) {
-				array_push($plans, $row);
-			}
-
-
-			$query = "SELECT Ingredient_Name FROM Ingredient;";
-
-			$statement = $db->prepare($query);
-			$statement->execute();
-
-			$results = $statement->get_result();
-			$ingredients = array();
-			while($row = $results->fetch_assoc()){
-				array_push($ingredients, $row);
-			}
-
-			$query = "SELECT Meal_Name From Meal;";
-			
-			$statement = $db->prepare($query);
-			$statement->execute();
-
-			$results = $statement->get_result();
-			$meals = array();
-			while($row = $results->fetch_assoc()){
-				array_push($meals, $row);
-			}
-
 			
 			$groceries = $newdata;
 			$foodLoad = $data;
