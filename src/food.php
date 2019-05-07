@@ -40,7 +40,7 @@
 				array_push($data, $row);
 			}
 			
-			$query = "SELECT Ingredient_Name, SUM(Ingredient_Amount) as Amount FROM Recipe WHERE Meal_Name in (Select M_Name From IN_NUTPLAN where Nut_Plan_Name = ?) GROUP BY Ingredient_Name;";
+			$query = "Select Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
 
 		
 			$data1 = array();
@@ -57,11 +57,11 @@
 
 			$newdata = array();
 
-			$query2 = "SELECT Ingredient_Name, Unit, Amount*? As Total From ingredient where Ingredient_Name = ?;";
+			$query2 = "SELECT Ingredient_Name, Unit, Amount*? As Total, Amount*?*`Price/Unit` As Price From ingredient where Ingredient_Name = ?;";
 
 			for($i = 0; $i < count($data1); $i++){
 				$statement2 = $db->prepare($query2);
-				$statement2->bind_param("is", $data1[$i]['Amount'], $data1[$i]['Ingredient_Name']);
+				$statement2->bind_param("iis", $data1[$i]['Amount'], $data1[$i]['Amount'], $data1[$i]['Ingredient_Name']);
 				$statement2->execute();
 
 				$results = $statement2->get_result();
@@ -139,7 +139,7 @@
 		          	// alert(request.response);
 		          	var food = JSON.parse(request.response);
 		          	var groceries = food[1];
-		          	// alert(groceries[i]['Ingredient_Name']);
+		          	// alert(JSON.stringify(groceries));
 		          	var food = food[0];
 		          	// document.getElementById('grocery_list').innerHTML = groceries[1]['Ingredient_Name'];
 			        var prevDay = food[0]['Day'];
@@ -195,9 +195,18 @@
 					}
 					document.getElementById('grocery_list').innerHTML = "<h2>Grocery List</h2>";
 					document.getElementById('grocery_list').innerHTML += "<table style='margin:auto; padding-bottom:5px' id='grocery_table'>";
+					document.getElementById('grocery_table').innerHTML += "<tr><th>Ingredient Name:</th><th>Ingredient Amount:</th><th>Ingredient Unit:</th><th>Price:</th></tr>";
+					var sum = 0
 					for(var i = 0; i < groceries.length; i++){
-						document.getElementById('grocery_table').innerHTML += "<tr><td>"+groceries[i]['Ingredient_Name']+"</td><td>"+groceries[i]['Total']+" "+groceries[i]['Unit']+"</td></tr>";
+						var price = parseFloat(groceries[i]["Price"]);
+						sum += price;
+						price = price.toFixed(2);
+						// alert(groceries[i]['Total']);
+						var total = parseFloat(groceries[i]['Total']);
+						total = total.toFixed(2);
+						document.getElementById('grocery_table').innerHTML += "<tr><td>"+groceries[i]['Ingredient_Name']+"</td><td style='text-align:right'>"+total+"</td><td>"+groceries[i]['Unit']+"</td><td>$"+price+"</td></tr>";
 					}
+						document.getElementById('grocery_table').innerHTML+= "<tr><td></td><td></td><th>Total:</th><td>$"+sum.toFixed(2)+"</td></tr>";
 
 					// document.getElementById('weekly_meals').innerHTML +=  "</table>";				
 				
@@ -377,9 +386,13 @@
 				else{
 					print "<h2>Grocery List</h2>";
 					print "<table style='margin:auto; padding-bottom:5px'>";
+					print "<tr><th>Ingredient Name:</th><th>Ingredient Amount:</th><th>Ingredient Unit:</th><th>Price:</th></tr>";
+					$sum = 0;
 					for($i = 0; $i<count($groceries); $i++){
-						print "<tr><td>".$groceries[$i]['Ingredient_Name']."</td><td>".$groceries[$i]['Total']." ".$groceries[$i]['Unit']."</td></tr>";
+						printf("<tr><td>".$groceries[$i]['Ingredient_Name']."</td><td style='text-align:right'>".$groceries[$i]['Total']."</td><td>".$groceries[$i]['Unit']."</td><td>$%0.2f</td></tr>", $groceries[$i]["Price"]);
+						$sum+=$groceries[$i]["Price"];
 					}
+					printf("<tr><td></td><td></td><th>Total:</th><td>$%0.2f</td></tr>", $sum);
 					print "</table>";
 				}
 				?>
@@ -496,7 +509,7 @@
 					</tr>
 					<tr>
 						<td>Serving Size:</td>
-						<td><input type="number" name="Amount" required></td>
+						<td><input type="number" step=".1" name="Amount" required></td>
 						<td>(ex. if unit is Oz and serving size is 8 Oz, enter 8)</td>
 					</tr>
 					<tr>
@@ -557,10 +570,9 @@
 		</div>
 		<div id="planCreator" style="width:66%">
 			<h2>Create a New Meal Plan</h2>
-			<h3>Variety is the spice of life, use each meal only once</h3>
 			<h2 id="formFeedback"><?php
-				if(isset($_GET['PlanError']) && $_GET['PlanError'] === 1){ print "Error Creating Plan - Plan Name Already Exists";}
-				if(isset($_GET['PlanError']) && $_GET['PlanError'] === 2){ print "Error Creating Plan - Could not insert one or more meals";}
+				if(isset($_GET['PlanError']) && $_GET['PlanError'] == 1){ print "Error Creating Plan - Plan Name Already Exists";}
+				if(isset($_GET['PlanError']) && $_GET['PlanError'] == 2){ print "Error Creating Plan - Could not insert one or more meals";}
 				if(isset($_GET['PlanError']) && $_GET['PlanError'] > 2){print "Error Creating Plan";}
 				if(isset($_GET['PlanCreation'])){print "Plan Creation Success";}
 			?>	

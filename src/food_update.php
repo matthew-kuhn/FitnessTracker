@@ -24,7 +24,7 @@
 	function getGroceries($plan, $planName){
 		global $db;
 
-		$query = "SELECT Ingredient_Name, SUM(Ingredient_Amount) as Amount FROM Recipe WHERE Meal_Name in (Select M_Name From IN_NUTPLAN where Nut_Plan_Name = ?) GROUP BY Ingredient_Name;";
+		$query = "Select Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
 
 		
 		$data = array();
@@ -45,11 +45,11 @@
 		// 	$newdata[$data[$i]['Ingredient_Name']] = $data[$i]['Amount'];
 		// }
 
-		$query2 = "SELECT Ingredient_Name, Unit, Amount*? As Total From ingredient where Ingredient_Name = ?;";
+		$query2 = "SELECT Ingredient_Name, Unit, Amount*? As Total, Amount*?*`Price/Unit` As Price From ingredient where Ingredient_Name = ?;";
 
 		for($i = 0; $i < count($data); $i++){
 			$statement2 = $db->prepare($query2);
-			$statement2->bind_param("is", $data[$i]['Amount'], $data[$i]['Ingredient_Name']);
+			$statement2->bind_param("iis", $data[$i]['Amount'], $data[$i]['Amount'], $data[$i]['Ingredient_Name']);
 			$statement2->execute();
 
 			$results = $statement2->get_result();
@@ -58,7 +58,6 @@
 				array_push($newdata, $row);
 			}
 		}
-
 		return $newdata;
 	}
 

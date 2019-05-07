@@ -25,9 +25,6 @@
 
 		$stmt->bind_param("ss", $myusername, $mypassword);
 
-		echo "".$myusername." ".$mypassword;
-		// exit;
-
 		$stmt->execute();
 
 		// $stmt->store_result();
@@ -40,9 +37,9 @@
 	      header("location:index.php?err=1");
 	      exit;
     	}
-
+    	$row = $result->fetch_assoc();
     	$stmt->close();
-
+    	$_SESSION['fname'] = $row['First_Name'];
     	$_SESSION['myusername']=$_POST['myusername'];
 	    header("location:index.php"); 
 	    exit;

@@ -17,7 +17,7 @@
                exit;
              }
 
-			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date limit 7";
+			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date DESC limit 7";
 
 			$statement = $db->prepare($query);
 			$statement->bind_param('s', $_SESSION['myusername']);
@@ -34,6 +34,7 @@
 					array_push($days, $row);
 				}
 			}
+			$days = array_reverse($days);
 
 ?>
 <html lang="en-US">
@@ -44,6 +45,7 @@
 		<meta name="description" content="The page for tracking workout and food data">
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
+		<script src="../node_modules/Chart.js/dist/chart.bundle.js"></script>
 		<script type="text/javascript">
 
 		</script>
@@ -71,7 +73,7 @@
 			}else{
 
 			?>
-			<h2>The Week So Far</h2>
+			<h2>Your Past 7 Days</h2>
 				<table style="margin: auto;">
 					<tr>
 						<th style="text-align: left">Day</th>
@@ -80,12 +82,111 @@
 					</tr>
 					<?php
 						for($i = 0; $i < count($days); $i++){
-							print "<tr><td>".substr($days[$i]['Date'], 0, 10)."</td><td>".$days[$i]['Calories']."</td><td>".$days[$i]['Weight']."</td></tr>";
+							print "<tr><td>".substr($days[$i]['Date'], 0, 10)."</td><td style='text-align:right'>".$days[$i]['Calories']."</td><td style='text-align:right'>".$days[$i]['Weight']."</td></tr>";
 						}
 
 
 					?>
 				</table>
+				<canvas id="weekChart" width="400" height="400" style="margin: auto"></canvas>
+				<script type="text/javascript">
+					var days = <?php echo json_encode($days); ?>;
+					var ctx = document.getElementById('weekChart');
+					var labelList = [];
+					var weights = [];
+					var cals = [];
+					for (var i = 0; i< days.length ; i++) {
+						cals.push(days[i]['Calories']);
+					}
+					for (var i = 0; i<days.length;i++) {
+						weights.push(days[i]['Weight']);
+					}
+					for(var i = 0; i < days.length; i++){
+						labelList.push(days[i]["Date"].substring(5,10));
+					}
+					var chart = new Chart(ctx, {
+							type : "bar",
+							data: {
+								labels : labelList,
+								datasets:[{
+									label : "Weight",
+									yAxisID: 'A',
+									data : weights,
+									backgroundColor : [
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)"
+									],
+									borderColor : [
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)"
+									],
+
+									borderWidth : 1
+								},
+								{
+									label : "Calories" , 
+									yAxisID : 'B',
+									data : cals,
+									fill : false,
+									backgroundColor :[
+										"rgba(26, 102, 255, .2)"
+									],
+									borderColor : [
+										"rgba(26, 102, 255, 1)"
+									],
+
+									type: 'line'
+								}]
+							},
+							options: {
+						        scales: {
+						        	xAxes:[{
+						        		scaleLabel : {
+						            		display : true,
+						            		labelString : 'Date'
+						            	},
+						        	}],
+						            yAxes: [{
+						            	id: 'A',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Weight (Lbs)'
+						            	},
+								        type: 'linear',
+								        position: 'left',
+						                ticks: {
+						                	suggestedMax : 300,
+						                    beginAtZero: true
+						                }
+						            },
+						            {
+						            	id: 'B',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Calories'
+						            	},
+								        type: 'linear',
+								        position: 'right',
+								        ticks: {
+								        	suggestedMax : 3500,
+						                    beginAtZero: true
+						                }
+						            }]
+						        }
+		   					 }
+						}
+					)
+				</script>
 			<?php
 
 			}

@@ -1,3 +1,79 @@
+<?php
+	
+			// retrieve session information
+			session_start();
+
+			// if no username set, then redirect to login
+			if(!isset($_SESSION['myusername'])){
+				header("location:index.php");
+			}
+
+			if(isset($_SESSION['myusername'])){
+			@ $db = new mysqli('localhost', 'root', '', 'FitnessTracker');
+
+			if (mysqli_connect_errno()) 
+             { 
+               echo 'ERROR: Could not connect to database.  Error is '.mysqli_connect_error();
+               exit;
+             }
+
+			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date DESC limit 7";
+
+			$statement = $db->prepare($query);
+			$statement->bind_param('s', $_SESSION['myusername']);
+			$statement->execute(); 
+			$results = $statement->get_result();
+
+			if(!isset($results)){
+				$tracked = false;
+			}
+			else{
+				$tracked = true;
+				$days = array();
+				while ($row = $results->fetch_assoc()) {
+					array_push($days, $row);
+				}
+			}
+			$days = array_reverse($days);
+
+			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date DESC limit 30";
+
+			$statement = $db->prepare($query);
+			$statement->bind_param('s', $_SESSION['myusername']);
+			$statement->execute(); 
+			$results = $statement->get_result();
+
+			if(!isset($results)){
+				$tracked = false;
+			}
+			else{
+				$tracked = true;
+				$month = array();
+				while ($row = $results->fetch_assoc()) {
+					array_push($month, $row);
+				}
+			}
+			$month = array_reverse($month);
+
+			$query = "SELECT * FROM Day WHERE UserID = ? Order By Date DESC limit 365";
+
+			$statement = $db->prepare($query);
+			$statement->bind_param('s', $_SESSION['myusername']);
+			$statement->execute(); 
+			$results = $statement->get_result();
+
+			if(!isset($results)){
+				$tracked = false;
+			}
+			else{
+				$tracked = true;
+				$year = array();
+				while ($row = $results->fetch_assoc()) {
+					array_push($year, $row);
+				}
+			}
+			$year = array_reverse($year);
+?>
 <html lang = "en-US">
 	<head>
 		<title>Fitness Tracker</title>
@@ -6,6 +82,7 @@
 		<meta name="description" content="The homepage for the fitness tracking website">
 		<link rel="stylesheet" type="text/css" href="fit.css">
 		<link rel="shortcut icon" type="image/png" href="favicon.ico">
+		<script src="../node_modules/Chart.js/dist/chart.bundle.js"></script>
 		<script type="text/javascript">
 			function checkLoginForm()
 		      {
@@ -82,22 +159,347 @@
 		<div id="login">
 			<?php
 
-			  // retrieve session information
-			  session_start();
-
 			  // if no username set, then redirect to login
 			  if(isset($_SESSION['myusername'])){
 			?>
-			<h2>Welcome, <?php echo $_SESSION['myusername'] ?></h2>
-				<p>add a summary of current week, from database</p>
-				<form style="display: block; margin: auto">
-					<select style="display: block; margin: 0 auto; margin-bottom: 5px">
-						<option>Weekly Summary</option>
-						<option>Monthly Summary</option>
-						<option>Yearly Summary</option>
-					</select>
-					<input type="submit" name="submit" style="display: block; margin: 0 auto">
-				</form>
+			<h2>Welcome, <?php echo $_SESSION['fname'] ?></h2>
+				<h3>Your past 7 Days</h3>
+				<canvas id="weekChart" width="400" height="400" style="margin: auto"></canvas>
+				<script type="text/javascript">
+					var days = <?php echo json_encode($days); ?>;
+					var ctx = document.getElementById('weekChart');
+					var labelList = [];
+					var weights = [];
+					var cals = [];
+					for (var i = 0; i< days.length ; i++) {
+						cals.push(days[i]['Calories']);
+					}
+					for (var i = 0; i<days.length;i++) {
+						weights.push(days[i]['Weight']);
+					}
+					for(var i = 0; i < days.length; i++){
+						labelList.push(days[i]["Date"].substring(5,10));
+					}
+					var chart = new Chart(ctx, {
+							type : "bar",
+							data: {
+								labels : labelList,
+								datasets:[{
+									label : "Weight",
+									yAxisID: 'A',
+									data : weights,
+									backgroundColor : [
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)"
+									],
+									borderColor : [
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)"
+									],
+
+									borderWidth : 1
+								},
+								{
+									label : "Calories" , 
+									yAxisID : 'B',
+									data : cals,
+									fill : false,
+									backgroundColor :[
+										"rgba(26, 102, 255, .2)"
+									],
+									borderColor : [
+										"rgba(26, 102, 255, 1)"
+									],
+
+									type: 'line'
+								}]
+							},
+							options: {
+						        scales: {
+						        	xAxes:[{
+						        		scaleLabel : {
+						            		display : true,
+						            		labelString : 'Date'
+						            	},
+						        	}],
+						            yAxes: [{
+						            	id: 'A',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Weight (Lbs)'
+						            	},
+								        type: 'linear',
+								        position: 'left',
+						                ticks: {
+						                	suggestedMax : 300,
+						                    beginAtZero: true
+						                }
+						            },
+						            {
+						            	id: 'B',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Calories'
+						            	},
+								        type: 'linear',
+								        position: 'right',
+								        ticks: {
+								        	suggestedMax : 3500,
+						                    beginAtZero: true
+						                }
+						            }]
+						        }
+		   					 }
+						}
+					)
+				</script>
+				<h3>Your past 30 Days</h3>
+				<canvas id="monthChart" width="400" height="400" style="margin: auto"></canvas>
+				<script type="text/javascript">
+					var month = <?php echo json_encode($month); ?>;
+					var ctx = document.getElementById('monthChart');
+					var labelList = [];
+					var weights = [];
+					var cals = [];
+					for (var i = 0; i< month.length ; i++) {
+						cals.push(month[i]['Calories']);
+					}
+					for (var i = 0; i<month.length;i++) {
+						weights.push(month[i]['Weight']);
+					}
+					for(var i = 0; i < month.length; i++){
+						labelList.push(month[i]["Date"].substring(5,10));
+					}
+					var chart = new Chart(ctx, {
+							type : "bar",
+							data: {
+								labels : labelList,
+								datasets:[{
+									label : "Weight",
+									yAxisID: 'A',
+									data : weights,
+									backgroundColor : [
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)",
+										"rgba(255, 26, 26, .2)"
+										
+									],
+									borderColor : [
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)",
+										"rgba(255, 26, 26, 1)"
+									],
+
+									borderWidth : 1
+								},
+								{
+									label : "Calories" , 
+									yAxisID : 'B',
+									data : cals,
+									fill : false,
+									backgroundColor :[
+										"rgba(26, 102, 255, .2)"
+									],
+									borderColor : [
+										"rgba(26, 102, 255, 1)"
+									],
+
+									type: 'line'
+								}]
+							},
+							options: {
+						        scales: {
+						        	xAxes:[{
+						        		scaleLabel : {
+						            		display : true,
+						            		labelString : 'Date'
+						            	},
+						        	}],
+						            yAxes: [{
+						            	id: 'A',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Weight (Lbs)'
+						            	},
+								        type: 'linear',
+								        position: 'left',
+						                ticks: {
+						                	suggestedMax : 300,
+						                    beginAtZero: true
+						                }
+						            },
+						            {
+						            	id: 'B',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Calories'
+						            	},
+								        type: 'linear',
+								        position: 'right',
+								        ticks: {
+								        	suggestedMax : 3500,
+						                    beginAtZero: true
+						                }
+						            }]
+						        }
+		   					 }
+						}
+					)
+				</script>
+				<h3>Your past 30 Days</h3>
+				<canvas id="yearChart" width="400" height="400" style="margin: auto"></canvas>
+				<script type="text/javascript">
+					var year = <?php echo json_encode($year); ?>;
+					var ctx = document.getElementById('yearChart');
+					var labelList = [];
+					var weights = [];
+					var cals = [];
+					for (var i = 0; i< year.length ; i++) {
+						cals.push(year[i]['Calories']);
+					}
+					for (var i = 0; i<year.length;i++) {
+						weights.push(year[i]['Weight']);
+					}
+					for(var i = 0; i < year.length; i++){
+						labelList.push(year[i]["Date"].substring(5,10));
+					}
+					var chart = new Chart(ctx, {
+							type : "bar",
+							data: {
+								labels : labelList,
+								datasets:[{
+									label : "Weight",
+									yAxisID: 'A',
+									data : weights,
+									backgroundColor : [
+										"rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)",   "rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)","rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)", "rgba(255, 26, 26, .2)"
+										],
+									borderColor : [
+										 "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)", "rgba(255, 26, 26, 1)"
+									],
+
+									borderWidth : 1
+								},
+								{
+									label : "Calories" , 
+									yAxisID : 'B',
+									data : cals,
+									fill : false,
+									backgroundColor :[
+										"rgba(26, 102, 255, .2)"
+									],
+									borderColor : [
+										"rgba(26, 102, 255, 1)"
+									],
+
+									type: 'line'
+								}]
+							},
+							options: {
+						        scales: {
+						        	xAxes:[{
+						        		scaleLabel : {
+						            		display : true,
+						            		labelString : 'Date'
+						            	},
+						        	}],
+						            yAxes: [{
+						            	id: 'A',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Weight (Lbs)'
+						            	},
+								        type: 'linear',
+								        position: 'left',
+						                ticks: {
+						                	suggestedMax : 300,
+						                    beginAtZero: true
+						                }
+						            },
+						            {
+						            	id: 'B',
+						            	scaleLabel : {
+						            		display : true,
+						            		labelString : 'Calories'
+						            	},
+								        type: 'linear',
+								        position: 'right',
+								        ticks: {
+								        	suggestedMax : 3500,
+						                    beginAtZero: true
+						                }
+						            }]
+						        }
+		   					 }
+						}
+					)
+					</script>
 			<?php } else {?>
 			<!-- login form or create user form-->
 			<form name="loginForm" method="post" id="login_form" action="checklogin.php" onsubmit="return checkLoginForm()">
@@ -105,7 +507,7 @@
 					<h2 id="formFeedback"><?php 
                           if (isset($_GET['err'])) {echo 'ERROR: Username - password not valid.'; }
                           if (isset($_GET['newUserSuccess'])) {echo'New User created successfully';}
-                        ?><h2>
+                        ?></h2>
                   <tr>
                   	<td style="width:80px; text-align: right">Username:</td>
                   	<td ><input type="text" name="myusername" id="myusername" required ></td>
@@ -150,3 +552,5 @@
 			<?php } ?>
 		</div>
 	</body>
+</html>
+<?php } ?>
