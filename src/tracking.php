@@ -59,6 +59,7 @@
 				<a href="tracking.php">Tracking</a>			
 				<a href="index.php">Home</a>
 				<a style="float: right" href="logout.php">Sign Out</a>
+				<p style="float: right"><?php echo $_SESSION['myusername'];?></p>
 			</nav>
 		</header>
 		<div id="Weekly_Summary" style="margin: 0 auto; width: 66%;">

@@ -3,11 +3,6 @@
 			// retrieve session information
 			session_start();
 
-			// if no username set, then redirect to login
-			if(!isset($_SESSION['myusername'])){
-				header("location:index.php");
-			}
-
 			if(isset($_SESSION['myusername'])){
 			@ $db = new mysqli('localhost', 'root', '', 'FitnessTracker');
 
@@ -73,6 +68,7 @@
 				}
 			}
 			$year = array_reverse($year);
+		}
 ?>
 <html lang = "en-US">
 	<head>
@@ -149,6 +145,9 @@
 				<a href="food.php">Food Info</a>
 				<a href="tracking.php">Tracking</a>
 				<a style="float: right" href="logout.php">Sign Out</a>
+				<?php if(isset($_SESSION['myusername'])){ ?>
+				<p style="float: right"><?php echo $_SESSION['myusername'];?></p>
+			<?php } ?>
 			</nav>
 		</header>
 		<div id="info">
@@ -412,7 +411,7 @@
 						}
 					)
 				</script>
-				<h3>Your past 30 Days</h3>
+				<h3>Your past 365 Days</h3>
 				<canvas id="yearChart" width="400" height="400" style="margin: auto"></canvas>
 				<script type="text/javascript">
 					var year = <?php echo json_encode($year); ?>;
@@ -553,4 +552,3 @@
 		</div>
 	</body>
 </html>
-<?php } ?>
