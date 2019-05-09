@@ -5,7 +5,7 @@
 	function getPlan($planName){
 		global $db;
 
-		$query = "SELECT * FROM IN_NUTPLAN WHERE NUT_PLAN_NAME = ? ORDER BY Day ASC, Meal_num ASC;";
+		$query = "SELECT Nut_Plan_Name, M_Name, Day, Meal_num, Protein, Fat, Carbs  FROM IN_NUTPLAN, Meal WHERE NUT_PLAN_NAME = ? and M_Name = Meal_Name ORDER BY Day ASC, Meal_num ASC;";
 
 		$statement = $db->prepare($query);
 		$statement->bind_param('s', $planName);
@@ -24,7 +24,7 @@
 	function getGroceries($plan, $planName){
 		global $db;
 
-		$query = "Select Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
+		$query = "SELECT Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
 
 		
 		$data = array();

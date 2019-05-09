@@ -64,7 +64,7 @@
 
 			if(strlen($_SESSION['NPlan']) > 1){
 
-			$query = "SELECT * FROM IN_NUTPLAN WHERE NUT_PLAN_NAME = ? ORDER BY Day ASC, Meal_num ASC;";
+			$query = "SELECT Nut_Plan_Name, M_Name, Day, Meal_num, Protein, Fat, Carbs  FROM IN_NUTPLAN, Meal WHERE NUT_PLAN_NAME = ? and M_Name = Meal_Name ORDER BY Day ASC, Meal_num ASC;";
 
 			$statement = $db->prepare($query);
 			$statement->bind_param('s', $_SESSION['NPlan']);
@@ -76,7 +76,7 @@
 				array_push($data, $row);
 			}
 			
-			$query = "Select Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
+			$query = "SELECT Ingredient_Name, Sum(ingredient_amount) as Amount from (Select Ingredient_Name, Ingredient_Amount, Meal_Name from Recipe) as x, (Select M_Name from In_Nutplan where Nut_Plan_Name = ?) as y where x.Meal_Name = y.M_Name group by x.ingredient_name;";
 
 		
 			$data1 = array();
@@ -145,9 +145,25 @@
 			        var currDay = food[0]['Day'];
 			        var prevMeal = food[0]['Meal_num'];
 			        var currMeal = food[0]['Meal_num'];
+			        var pro = 0;
+			        var carbs = 0;
+			        var fats = 0;
+			        var prosum =0;
+			        var carbsum = 0;
+			        var fatsum = 0;
+			        document.getElementById('food_table').innerHTML += "<tr><th></th><th></th><th></th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Calories</th></tr>";
 		          	for (var i = 0; i < food.length; i++) {
 			          	currDay = food[i]['Day'];
 			          	currMeal = food[i]['Meal_num'];
+			          	if(currDay != prevDay){
+						document.getElementById('food_table').innerHTML += "<tr><th></th><th></th><th>Total:</th><th style='text-align:right'>"+pro+"</th><th style='text-align:right'>"+carbs+"</th><th style='text-align:right'>"+fats+"</th><th style='text-align:right'>"+((pro*4) + (carbs*4) + (fats*9))+"</th></tr>";
+							prosum += pro;
+							pro = 0;
+							carbsum += carbs;
+							carbs = 0;
+							fatsum += fats;
+							fats = 0;
+						}
 			          	if(currDay != prevDay || i == 0){
 							switch(food[i]['Day']){
 								case 1:
@@ -176,22 +192,25 @@
 						if(currMeal != prevMeal || i == 0){
 							switch(food[i]['Meal_num']){
 								case 1:
-									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Breakfast:</td><td>"+food[i]['M_Name']+"</td></tr>";
+									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Breakfast:</td><td>"+food[i]['M_Name']+"</td><td style='text-align:right'>"+food[i]['Protein']+"</td><td style='text-align:right'>"+food[i]['Carbs']+"</td><td style='text-align:right'>"+food[i]['Fat']+"</td><td style='text-align:right'>"+((food[i]['Protein']*4)+(food[i]['Carbs']*4)+(food[i]['Fat']*9))+"</td></tr>";
 									break;
 								case 2:
-									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Lunch:</td><td>"+food[i]['M_Name']+"</td></tr>";
+									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Lunch:</td><td>"+food[i]['M_Name']+"</td><td style='text-align:right'>"+food[i]['Protein']+"</td><td style='text-align:right'>"+food[i]['Carbs']+"</td><td style='text-align:right'>"+food[i]['Fat']+"</td><td style='text-align:right'>"+((food[i]['Protein']*4)+(food[i]['Carbs']*4)+(food[i]['Fat']*9))+"</td></tr>";
 									break;
 								case 3:
-									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Dinner:</td><td>"+food[i]['M_Name']+"</td></tr>";
+									document.getElementById('food_table').innerHTML +=  "<tr><td></td><td>Dinner:</td><td>"+food[i]['M_Name']+"</td><td style='text-align:right'>"+food[i]['Protein']+"</td><td style='text-align:right'>"+food[i]['Carbs']+"</td><td style='text-align:right'>"+food[i]['Fat']+"</td><td style='text-align:right'>"+((food[i]['Protein']*4)+(food[i]['Carbs']*4)+(food[i]['Fat']*9))+"</td></tr>";
 									break;
 							}
 						}else{
-							document.getElementById('food_table').innerHTML +=  "<tr><td></td><td></td><td>"+food[i]['M_Name']+"</td></tr>";
+							document.getElementById('food_table').innerHTML +=  "<tr><td></td><td></td><td>"+food[i]['M_Name']+"</td><td style='text-align:right'>"+food[i]['Protein']+"</td><td style='text-align:right'>"+food[i]['Carbs']+"</td><td style='text-align:right'>"+food[i]['Fat']+"</td><td style='text-align:right'>"+((food[i]['Protein']*4)+(food[i]['Carbs']*4)+(food[i]['Fat']*9))+"</td></tr>";
 						}
-
+						pro += food[i]['Protein'];
+						carbs += food[i]['Carbs'];
+						fats += food[i]['Fat'];
 						prevDay = currDay;
 						prevMeal = currMeal;
 					}
+					document.getElementById('food_table').innerHTML += "<tr><th></th><th></th><th>Total:</th><th style='text-align:right'>"+pro+"</th><th style='text-align:right'>"+carbs+"</th><th style='text-align:right'>"+fats+"</th><th style='text-align:right'>"+((pro*4) + (carbs*4) + (fats*9))+"</th></tr>";
 					document.getElementById('grocery_list').innerHTML = "<h2>Grocery List</h2>";
 					document.getElementById('grocery_list').innerHTML += "<table style='margin:auto; padding-bottom:5px' id='grocery_table'>";
 					document.getElementById('grocery_table').innerHTML += "<tr><th>Ingredient Name:</th><th>Ingredient Amount:</th><th>Ingredient Unit:</th><th>Price:</th></tr>";
@@ -408,13 +427,29 @@
 				else{
 					print "<h2>Your Weekly Plan</h2>";
 					print "<table style='margin: auto'>";
+					print "<tr><th></th><th></th><th></th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Calories</th></tr>";
 					$prevDay = $foodLoad[0]['Day'];
 					$currDay = $foodLoad[0]['Day'];
 					$prevMeal = $foodLoad[0]['Meal_num'];
 					$currMeal = $foodLoad[0]['Meal_num'];
+					$pro = 0;
+			        $carbs = 0;
+			        $fats = 0;
+			        $prosum =0;
+			        $carbsum = 0;
+			        $fatsum = 0;
 					for($i = 0; $i < count($foodLoad); $i ++){
 						$currDay = $foodLoad[$i]['Day'];
 						$currMeal = $foodLoad[$i]['Meal_num'];
+						if($currDay != $prevDay){
+						print "<tr><th></th><th></th><th>Total:</th><th style='text-align:right'>".$pro."</th><th style='text-align:right'>".$carbs."</th><th style='text-align:right'>".$fats."</th><th style='text-align:right'>".(($pro*4) + ($carbs*4) + ($fats*9))."</th></tr>";
+							$prosum += $pro;
+							$pro = 0;
+							$carbsum += $carbs;
+							$carbs = 0;
+							$fatsum += $fats;
+							$fats = 0;
+						}
 						if($currDay !== $prevDay || $i == 0){
 						switch($foodLoad[$i]['Day']){
 							case 1:
@@ -443,23 +478,25 @@
 					if($currMeal !== $prevMeal || $i == 0){
 						switch($foodLoad[$i]['Meal_num']){
 							case 1:
-								print "<tr><td></td><td>Breakfast:</td><td>".$foodLoad[$i]['M_Name']."</td></tr>";
+								print "<tr><td></td><td>Breakfast:</td><td>".$foodLoad[$i]['M_Name']."</td><td style='text-align:right'>".$foodLoad[$i]['Protein']."</td><td style='text-align:right'>".$foodLoad[$i]['Carbs']."</td><td style='text-align:right'>".$foodLoad[$i]['Fat']."</td><td style='text-align:right'>".(($foodLoad[$i]['Protein']*4)+($foodLoad[$i]['Carbs']*4)+($foodLoad[$i]['Fat']*9))."</td></tr>";
 								break;
 							case 2:
-								print "<tr><td></td><td>Lunch:</td><td>".$foodLoad[$i]['M_Name']."</td></tr>";
+								print "<tr><td></td><td>Lunch:</td><td>".$foodLoad[$i]['M_Name']."</td><td style='text-align:right'>".$foodLoad[$i]['Protein']."</td><td style='text-align:right'>".$foodLoad[$i]['Carbs']."</td><td style='text-align:right'>".$foodLoad[$i]['Fat']."</td><td style='text-align:right'>".(($foodLoad[$i]['Protein']*4)+($foodLoad[$i]['Carbs']*4)+($foodLoad[$i]['Fat']*9))."</td></tr>";
 								break;
 							case 3:
-								print "<tr><td></td><td>Dinner:</td><td>".$foodLoad[$i]['M_Name']."</td></tr>";
+								print "<tr><td></td><td>Dinner:</td><td>".$foodLoad[$i]['M_Name']."</td><td style='text-align:right'>".$foodLoad[$i]['Protein']."</td><td style='text-align:right'>".$foodLoad[$i]['Carbs']."</td><td style='text-align:right'>".$foodLoad[$i]['Fat']."</td><td style='text-align:right'>".(($foodLoad[$i]['Protein']*4)+($foodLoad[$i]['Carbs']*4)+($foodLoad[$i]['Fat']*9))."</td></tr>";
 								break;
 						}
 					}else{
-						print "<tr><td></td><td></td><td>".$foodLoad[$i]['M_Name']."</td></tr>";
+						print "<tr><td></td><td></td><td>".$foodLoad[$i]['M_Name']."</td><td style='text-align:right'>".$foodLoad[$i]['Protein']."</td><td style='text-align:right'>".$foodLoad[$i]['Carbs']."</td><td style='text-align:right'>".$foodLoad[$i]['Fat']."</td><td style='text-align:right'>".(($foodLoad[$i]['Protein']*4)+($foodLoad[$i]['Carbs']*4)+($foodLoad[$i]['Fat']*9))."</td></tr>";
 					}
-
+						$pro += $foodLoad[$i]['Protein'];
+						$carbs += $foodLoad[$i]['Carbs'];
+						$fats += $foodLoad[$i]['Fat'];
 						$prevDay = $currDay;
 						$prevMeal = $currMeal;
 					}
-
+					print "<tr><th></th><th></th><th>Total:</th><th style='text-align:right'>".$pro."</th><th style='text-align:right'>".$carbs."</th><th style='text-align:right'>".$fats."</th><th style='text-align:right'>".(($pro*4) + ($carbs*4) + ($fats*9))."</th></tr>";
 					print "</table>";				
 				}
 
