@@ -131,6 +131,7 @@
 						}
 						document.getElementById('plan_table').innerHTML +=  "<tr><td style='text-align:center'><button onclick='workoutChange(\""+plan[i]['W_NAME']+"\")' style='background:none!important; color:inherit; border:none; padding:0!important; font: inherit; cursor: pointer;'>"+plan[i]['W_NAME']+"</button></td></tr>";
 					}
+					workoutChange(plan[0]['W_NAME']);
 				}
 
 				var content = document.getElementById('WPlan').value;
