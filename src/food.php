@@ -467,7 +467,7 @@
 			?>
 		</div>
 		<div id="meal_plans" style="width:66%">
-			<h2>Current Meal Plan <!-- This is where  we will print the name from the DB--></h3>
+			<h2>Current Meal Plan</h2>
 					<select id="mealPlan" style="display: block; margin: 0 auto; margin-top: 5px; margin-bottom: 5px;">
 						<?php
 							for($i = 0; $i < count($plans); $i++){
@@ -485,11 +485,11 @@
 		</div>
 		<div id="ingredientCreator" style="width: 66%">
 			<h2>Create a New Ingredient</h2>
-			<h2 id="formFeedback"><?php
+			<h3 id="formFeedback"><?php
 				if(isset($_GET['IngredientError'])){ print "Error Creating Ingredent";}
 				if(isset($_GET['IngredientCreation'])){print "Ingredient Creation Success";}
 			?>	
-			</h2>
+			</h3>
 			<form method="post" action="create_food.php">
 				<table style="margin: auto">
 					<tr>

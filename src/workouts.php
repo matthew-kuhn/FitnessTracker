@@ -311,6 +311,11 @@
 		</div>
 		<div id='exercise_creator' style="text-align: center; width:66%">
 			<h2>Create a New Exercise</h2>
+			<h3 id="formFeedback"><?php
+				if(isset($_GET['ExerciseError'])){ print "Error Creating Exercise";}
+				if(isset($_GET['exerciseSuccess'])){print "Exercise Creation Success";}
+			?>	
+			</h3>
 			<form method="post" action="create_workout.php">
 				<table style="margin:auto">
 					<tr>
@@ -329,6 +334,12 @@
 		</div>
 		<div id='workout_creator' style="text-align: center; width:66%">
 			<h2>Create a New Workout</h2>
+			<h3 id="formFeedback"><?php
+				if(isset($_GET['WorkoutError'])&&$_GET['WorkoutError'] == 1){ print "Workout Name Already Exists";}
+				if(isset($_GET['WorkoutError'])&&$_GET['WorkoutError'] == 2){ print "Could not insert exercises into workout";}
+				if(isset($_GET['workoutSuccess'])){print "Workout Creation Success";}
+			?>	
+			</h3>
 			<form method="post" action="create_workout.php">
 				<table style="margin:auto" id="workout_maker">
 					<tr>
@@ -374,6 +385,12 @@
 		</div>
 		<div id="plan_creator" style="text-align: center; width:66%">
 			<h2>Create a New Plan</h2>
+			<h3 id="formFeedback"><?php
+				if(isset($_GET['planError'])&&$_GET['planError'] == 1){ print "Plan Name Already Exists";}
+				if(isset($_GET['planError'])&&$_GET['planError'] == 2){ print "Could not insert workouts into plan";}
+				if(isset($_GET['planSuccess'])){print "Plan Creation Success";}
+			?>	
+			</h3>
 			<form method="post" action="create_workout.php">
 				<table style="margin:auto" id="plan_maker">
 					<tr>

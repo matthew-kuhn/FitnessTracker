@@ -74,14 +74,14 @@
 					<table style="margin: 0 auto">
 						<tr>
 							<td>Calories:</td>
-							<td><input type="number" name="cals" required></td>
+							<td><input type="number" name="cals" required min="0" max="10000"></td>
 						</tr>
 						<tr>
 							<td>Weight:</td>
-							<td><input type="number" step=".1" name="weight" required></td>
+							<td><input type="number" step=".1" name="weight" required min="0" max="1200"></td>
 						</tr>
 						<tr>
-							<td colspan="2" style="text-align: center" id="dateRow"><input type="date" name="date" id="date" required></td>
+							<td colspan="2" style="text-align: center" id="dateRow"><input type="date" name="date" id="date" required min="2000-01-01" max= <?php echo date("Y-m-d")?>></td>
 						</tr>
 						<tr>
 							<td colspan="2" style="text-align: center"><input type="submit" value="Record Data"></td>
